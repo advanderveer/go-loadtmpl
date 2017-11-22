@@ -3,8 +3,7 @@ Load standard library HTML templates from an `http.Filesystem` while adding inhe
 
 ## Example
 
-First define your base template:
-
+First define your base template, e.g _layout.html_:
 ```html
 <html>
   <body>
@@ -16,13 +15,15 @@ First define your base template:
 </html>
 ```
 
-then write the template that extends it and add the specially crafted comment at the top:
+Then, write the template that extends it and add the specially crafted comment at the top:
 
 ```html
 {{/* extends "layout.html" */}}
 {{block "page_title" .}}About{{end}}
 {{block "page" .}}I load templates{{end}}
 ```
+
+In you Go file, probably somewhere next to your web handler
 
 ```Go
 fs := http.Dir(".") //provide access to the template files through the http.FileSystem interface.
