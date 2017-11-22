@@ -13,12 +13,17 @@ import (
 //name are cached and not loaded calls
 type Loader struct {
 	fs    http.FileSystem
+	funcs template.FuncMap
 	cache map[string]*template.Template
 }
 
 //New loader will be setup
-func New(fs http.FileSystem) *Loader {
-	return &Loader{fs: fs, cache: map[string]*template.Template{}}
+func New(fs http.FileSystem, funcs template.FuncMap) *Loader {
+	return &Loader{
+		fs:    fs,
+		funcs: funcs,
+		cache: map[string]*template.Template{},
+	}
 }
 
 //Load a template and cache it.
@@ -58,6 +63,7 @@ func (l *Loader) load(name string) (t *template.Template, err error) {
 		text = fmt.Sprintf(`{{ define "%s"}}%s{{end}}`, name, text)
 	} else {
 		t = template.New(name)
+		t = t.Funcs(l.funcs)
 	}
 
 	t, err = t.Parse(text)

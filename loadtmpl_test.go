@@ -48,7 +48,7 @@ func TestTemplateLoading(t *testing.T) {
 			}
 
 			fs := http.Dir(dir)
-			l := New(fs)
+			l := New(fs, nil)
 			tmpl, err := l.Load(c.Load)
 			if err != nil {
 				t.Fatal(err)
