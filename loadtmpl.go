@@ -15,6 +15,9 @@ type Loader struct {
 	fs    http.FileSystem
 	funcs template.FuncMap
 	cache map[string]*template.Template
+
+	//NoCache disables templates being loaded from cache
+	NoCache bool
 }
 
 //New loader will be setup
@@ -28,6 +31,10 @@ func New(fs http.FileSystem, funcs template.FuncMap) *Loader {
 
 //Load a template and cache it.
 func (l *Loader) Load(name string) (t *template.Template, err error) {
+	if l.NoCache {
+		return l.load(name)
+	}
+
 	if t, ok := l.cache[name]; ok {
 		return t, nil
 	}

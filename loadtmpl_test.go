@@ -16,6 +16,7 @@ func TestTemplateLoading(t *testing.T) {
 		Data      interface{}
 		Files     map[string]string
 		ExpOutput string
+		NoCache   bool
 	}{
 		{
 			Name:      "one extend",
@@ -38,6 +39,18 @@ func TestTemplateLoading(t *testing.T) {
 				"c.html": `{{/*extends "b.html"*/}}{{block "b" .}}c{{end}}`,
 			},
 		},
+		{
+			Name:      "three level extend, no cache",
+			Load:      "/c.html",
+			Data:      nil,
+			NoCache:   true,
+			ExpOutput: `a(b(c))`,
+			Files: map[string]string{
+				"a.html": `a({{block "a" .}}a{{end}})`,
+				"b.html": `{{/*extends "a.html"*/}}{{block "a" .}}b({{block "b" .}}b{{end}}){{end}}`,
+				"c.html": `{{/*extends "b.html"*/}}{{block "b" .}}c{{end}}`,
+			},
+		},
 	} {
 		t.Run(c.Name, func(t *testing.T) {
 			dir, _ := ioutil.TempDir("", "loadtmpl_")
@@ -49,6 +62,10 @@ func TestTemplateLoading(t *testing.T) {
 
 			fs := http.Dir(dir)
 			l := New(fs, nil)
+			if c.NoCache {
+				l.NoCache = true
+			}
+
 			tmpl, err := l.Load(c.Load)
 			if err != nil {
 				t.Fatal(err)
